@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StealthScan | Obfuscation Strength Tester & Code Protector</title>
+<meta name="description" content="Test how resistant your JavaScript is to reverse engineering. Obfuscation meter, de-obfuscation helper and safe protectors — 100% local.">
+<link rel="canonical" href="https://aoodiakdiro0001-ops.github.io/stealthscan/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0e17">
+<meta property="og:type" content="website">
+<meta property="og:title" content="StealthScan | Obfuscation Tester">
+<meta property="og:description" content="Measure, understand and improve your code protection.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Consolas,monospace}
+:root{--bg:#0b0e17;--panel:#131a30;--line:#283257;--grn:#34d399;--blu:#60a5fa;--ylw:#fbbf24;--pur:#c084fc;--txt:#dde4f4;--mut:#8b98b8;--red:#f87171}
+body{background:var(--bg);color:var(--txt)}
+header{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{font-size:22px;font-weight:900;color:var(--pur)}
+.logo small{display:block;font-size:11px;color:var(--mut);font-weight:400}
+header select{margin-left:auto;background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:14px;padding:7px 10px;font-size:13px}
+.tabs{display:flex;gap:6px;padding:14px 16px 0;flex-wrap:wrap;max-width:1100px;margin:0 auto}
+.tabs button{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-bottom:none;padding:10px 16px;border-radius:12px 12px 0 0;cursor:pointer;font-weight:800;font-size:13px}
+.tabs button.on{background:#1c2547;color:var(--pur)}
+main{max-width:1100px;margin:0 auto;padding:18px 15px 60px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:0 14px 14px 14px;padding:22px;display:none}
+.panel.on{display:block}
+.panel h2{color:var(--pur);margin-bottom:6px;font-size:19px}
+.panel p.sub{color:var(--mut);font-size:13px;margin-bottom:12px;line-height:1.7}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:center}
+textarea{width:100%;min-height:150px;background:#0b0e17;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:12px;font-family:Consolas,monospace;font-size:12.5px;direction:ltr}
+input[type=text]{background:#0b0e17;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 13px;font-size:13.5px}
+pre.out{background:#0b0e17;border:1px solid var(--line);border-radius:10px;padding:14px;font-size:12.5px;overflow:auto;max-height:420px;direction:ltr;text-align:left;white-space:pre-wrap}
+button.go{background:var(--pur);color:#12071f;border:none;padding:10px 22px;border-radius:10px;font-weight:900;cursor:pointer;font-size:14px}
+button.alt{background:transparent;color:var(--blu);border:1px solid var(--blu);padding:9px 16px;border-radius:10px;cursor:pointer;font-size:13px}
+label.chk{display:inline-flex;gap:6px;align-items:center;background:#0b0e17;border:1px solid var(--line);border-radius:18px;padding:7px 14px;font-size:13px;cursor:pointer}
+label.chk input{accent-color:var(--pur)}
+.note{background:#1c2547;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--mut);margin:10px 0;line-height:1.7}
+.gauge{display:flex;align-items:center;gap:16px;margin:14px 0;flex-wrap:wrap}
+.score{font-size:46px;font-weight:900;width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:5px solid;flex-shrink:0}
+.s-lo{color:var(--red);border-color:var(--red)} .s-mi{color:var(--ylw);border-color:var(--ylw)} .s-hi{color:var(--grn);border-color:var(--grn)}
+table.pt{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+table.pt td{border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:top}
+table.pt td:first-child{color:var(--mut)}
+.bar{height:8px;background:#0b0e17;border-radius:6px;overflow:hidden;min-width:90px}
+.bar div{height:100%;background:var(--pur)}
+.donate{background:linear-gradient(135deg,#1c2547,#0e2a1d);border:1px solid var(--grn);border-radius:16px;padding:20px;text-align:center;margin-top:8px;font-size:13px}
+.donate .addr{background:#0b0e17;border-radius:10px;padding:10px;font-family:monospace;font-size:12px;word-break:break-all;direction:ltr;margin:6px auto;color:var(--grn);max-width:560px}
+.adslot{max-width:1100px;margin:12px auto 0;padding:0 15px;text-align:center}
+.adslot .ph{display:block;border:1px dashed var(--line);border-radius:10px;color:var(--mut);font-size:12px;padding:10px}
+footer{text-align:center;color:var(--mut);font-size:12.5px;padding:26px 16px;border-top:1px solid var(--line);line-height:2}
+footer a{color:var(--grn)}
+#toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:12px 25px;border-radius:25px;z-index:200;display:none;font-size:14px;max-width:92vw;text-align:center}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">🥷 StealthScan<small data-i="tag"></small></div>
+<select id="langSel" onchange="setLang(this.value)">
+<option value="en" selected>🇬🇧 English</option><option value="tr">🇹🇷 Türkçe</option><option value="ar">🇸🇦 العربية</option>
+</select>
+</header>
+<div class="note" style="max-width:1100px;margin:12px auto 0"><span data-i="legalNote" style="display:block;background:#3d1e3d;border:1px solid var(--pur);color:#e9d5ff;border-radius:10px;padding:10px 14px;font-size:12.5px"></span></div>
+<div class="tabs" id="tabs"></div>
+<main>
+<section class="panel on" id="p-meter">
+<h2 data-i="mT"></h2><p class="sub" data-i="mS"></p>
+<textarea id="srcIn" rows="9" data-i-ph="srcPh"></textarea>
+<div class="row"><button class="go" onclick="runMeter()" data-i="btnScan"></button><button class="alt" onclick="loadPlain()" data-i="btnPlain"></button><button class="alt" onclick="loadObf()" data-i="btnObf"></button></div>
+<div id="meterOut"></div>
+</section>
+<section class="panel" id="p-deob">
+<h2 data-i="dT"></h2><p class="sub" data-i="dS"></p>
+<div class="row">
+<label class="chk"><input type="checkbox" id="dUnesc" checked><span data-i="opUnesc"></span></label>
+<label class="chk"><input type="checkbox" id="dB64" checked><span data-i="opB64"></span></label>
+<label class="chk"><input type="checkbox" id="dArr" checked><span data-i="opArr"></span></label>
+<label class="chk"><input type="checkbox" id="dPretty" checked><span data-i="opPretty"></span></label>
+<button class="go" onclick="runDeob()" data-i="btnDeob"></button>
+</div>
+<pre class="out" id="deobOut"></pre>
+<div class="row"><button class="alt" onclick="copyTxt(document.getElementById('deobOut').textContent)" data-i="btnCopy"></button></div>
+</section>
+<section class="panel" id="p-protect">
+<h2 data-i="pT"></h2><p class="sub" data-i="pS"></p>
+<div class="row">
+<label class="chk"><input type="checkbox" id="pStrip" checked><span data-i="opStrip"></span></label>
+<label class="chk"><input type="checkbox" id="pMin" checked><span data-i="opMin"></span></label>
+<label class="chk"><input type="checkbox" id="pHex"><span data-i="opHex"></span></label>
+<label class="chk"><input type="checkbox" id="pArr"><span data-i="opPack"></span></label>
+<button class="go" onclick="runProtect()" data-i="btnProt"></button>
+</div>
+<pre class="out" id="protOut"></pre>
+<div class="row"><button class="alt" onclick="copyTxt(document.getElementById('protOut').textContent)" data-i="btnCopy"></button><button class="alt" onclick="dlProt()" data-i="btnDl"></button></div>
+<div class="note" data-i="protNote"></div>
+<h2 style="margin-top:14px" data-i="snipT"></h2>
+<div class="row"><button class="alt" onclick="snip('domain')" data-i="snDom"></button><button class="alt" onclick="snip('debug')" data-i="snDbg"></button><button class="alt" onclick="snip('copy')" data-i="snCpy"></button></div>
+<pre class="out" id="snipOut"></pre>
+</section>
+<section class="panel" id="p-donate">
+<h2 data-i="doT"></h2><p class="sub" data-i="doS"></p>
+<div class="donate">
+<div>₿ BTC</div><div class="addr" id="btcA"></div>
+<div>₮ USDT-TRC20</div><div class="addr" id="usdtA"></div>
+<div class="row" style="justify-content:center"><button class="alt" onclick="copyTxt(document.getElementById('btcA').textContent)" data-i="btnCopy"></button></div>
+<div style="font-size:12.5px">🏦 Baran Avisat — TRY: <code dir="ltr">TR10 0001 0090 1008 4013 0050 01</code></div>
+<div style="font-size:12.5px">🏦 Baran Avisat — USD: <code dir="ltr">TR80 0001 0090 1008 4013 0050 02</code></div>
+</div>
+</section>
+</main>
+<div class="adslot" id="adFoot"><span class="ph" data-i="adHere" style="display:block;border:1px dashed var(--line);border-radius:10px;color:var(--mut);font-size:12px;padding:10px"></span></div>
+<footer><span data-i="foot"></span><br>📧 <a href="mailto:baranavisat@gmail.com">baranavisat@gmail.com</a> · 📞 <a href="tel:+905313263722" dir="ltr">+90 531 326 37 22</a> · <a href="https://wa.me/905313263722" target="_blank" rel="noopener">WhatsApp</a><br><a href="README.md" target="_blank">README</a> · MIT</footer>
+<div id="toast"></div>
+<script>
+const CONFIG={ads:{client:'',slot:'',carbonServe:'',carbonPlacement:''},
+pay:{btc:'bc1q8dhtdrndxsl70e97t8grydfe6pjue37zrhzf6c',usdt:'TLWdTjqqogkXNEXGiPWsGdjFP6ioycxeWW'}};
+const SAMPLE_PLAIN=`// my app\nfunction greet(name) {\n  // say hello\n  const msg = "Hello, " + name + "!";\n  console.log(msg);\n  return msg;\n}\ngreet("world");`;
+const SAMPLE_OBF=`var _0x1a2b=['Hello, ','world','log'];(function(_0x3c4d,_0x5e6f){var _0x7890=function(_0xabc){return _0x3c4d[_0xabc];};var _0xdef=_0x7890(0x0)+_0x7890(0x1);console[_0x7890(0x2)](_0xdef);}(_0x1a2b,0x2));eval(atob('Y29uc29sZS5sb2coMSk='));`;
+const T={
+en:{tag:'Obfuscation meter + de-obfuscator + protector',tabM:'📊 Meter',tabD:'🔍 De-obfuscate',tabP:'🛡️ Protect',tabDo:'💚 Donate',
+legalNote:'⚖️ Protect and analyze YOUR OWN code only — or code you are authorized to audit.',
+mT:'📊 Obfuscation Strength Meter',mS:'Paste JavaScript — get a 0–100 resistance score with a full breakdown. Higher = harder to reverse-engineer.',
+srcPh:'paste JavaScript here...',btnScan:'Analyze',btnPlain:'Plain sample',btnObf:'Obfuscated sample',
+dT:'🔍 De-obfuscation Helper',dS:'Unwrap common layers step by step: escapes, base64 previews, string-array mapping, pretty-print. Read-only — your code is never executed.',
+opUnesc:'Unescape \\x \\u',opB64:'Base64 previews',opArr:'Resolve string-array',opPretty:'Pretty-print',btnDeob:'Unwrap',
+pT:'🛡️ Safe Protector (demo-grade)',pS:'Reversible, semantics-preserving transforms for YOUR code: strip, minify, hex-encode strings, string-array pack. Verify output runs before shipping.',
+opStrip:'Strip comments',opMin:'Minify',opHex:'Hex-encode strings',opPack:'String-array pack',btnProt:'Protect',btnDl:'Download .js',protNote:'Demo-grade protection. For production, use a maintained obfuscator and test the output thoroughly.',
+snipT:'🧩 Anti-tamper snippets',snDom:'Domain lock',snDbg:'DevTools trap',snCpy:'Copy-guard',
+doT:'💚 Support StealthScan',doS:'Free forever. Donations fund new analyzers.',
+btnCopy:'Copy',adHere:'Your dev-tool ad here',foot:'StealthScan — free lab. Your code never leaves the browser.',
+copied:'Copied ✅',needCode:'Paste code first ⚠️',dlDone:'Downloaded ✅',
+kId:'Identifier entropy',kEsc:'Escaped strings',kEval:'eval / dynamic exec',kOx:'Hex-var names (_0x)',kArr:'String-array pattern',kMin:'Minification',kCmt:'Comment ratio',kLine:'Long lines',
+recLo:'Readable source — add minification, string encoding and identifier mangling.',
+recMi:'Partially protected — encode remaining strings and flatten hot paths.',
+recHi:'Strongly obfuscated — keep keys server-side; no client code is bulletproof.',
+mapT:'String-array mapping',foundL:'findings',noFind:'No obfuscation patterns detected — code looks plain.'},
+tr:{tag:'Karartma ölçer + çözümleyici + koruyucu',tabM:'📊 Ölçer',tabD:'🔍 Çözümle',tabP:'🛡️ Koru',tabDo:'💚 Destek',
+legalNote:'⚖️ Yalnızca KENDİ kodunuzu koruyun/inceleyin — yetkili denetim hariç.',
+mT:'📊 Karartma Güç Ölçer',mS:'JavaScript yapıştırın — 0–100 dayanıklılık puanı ve tam döküm alın.',
+srcPh:'JavaScript buraya...',btnScan:'Analiz Et',btnPlain:'Sade örnek',btnObf:'Karartılmış örnek',
+dT:'🔍 Çözümleme Yardımcısı',dS:'Yaygın katmanları adım adım açın: kaçışlar, base64 önizleme, string-dizi eşleme, güzelleştirme. Salt-okunur — kodunuz çalıştırılmaz.',
+opUnesc:'\\x \\u çöz',opB64:'Base64 önizleme',opArr:'String-dizi çöz',opPretty:'Güzelleştir',btnDeob:'Çöz',
+pT:'🛡️ Güvenli Koruyucu (demo)',pS:'KodUNUZ için tersinir dönüşümler: yorum silme, küçültme, hex-kodlama, string-dizi paketleme. Çıktının çalıştığını doğrulayın.',
+opStrip:'Yorum sil',opMin:'Küçült',opHex:'Hex-kodla',opPack:'Dizi-paketle',btnProt:'Koru',btnDl:'.js indir',protNote:'Demo düzey koruma. Üretim için bakımlı bir obfuscator kullanın ve çıktıyı test edin.',
+snipT:'🧩 Kurcalama önleyiciler',snDom:'Domain kilidi',snDbg:'DevTools tuzağı',snCpy:'Kopya koruması',
+doT:'💚 Destekle',doS:'Sonsuza dek ücretsiz. Bağışlar yeni analizörler getirir.',
+btnCopy:'Kopyala',adHere:'Reklamınız burada',foot:'StealthScan — ücretsiz laboratuvar. Kodunuz tarayıcıdan çıkmaz.',
+copied:'Kopyalandı ✅',needCode:'Önce kod yapıştırın ⚠️',dlDone:'İndirildi ✅',
+kId:'Tanımlayıcı entropisi',kEsc:'Kaçışlı dizgiler',kEval:'eval / dinamik çalıştırma',kOx:'Hex-değişken adları',kArr:'String-dizi deseni',kMin:'Küçültme',kCmt:'Yorum oranı',kLine:'Uzun satırlar',
+recLo:'Okunabilir kaynak — küçültme, string kodlama ve isim karartma ekleyin.',
+recMi:'Kısmen korumalı — kalan stringleri kodlayın.',
+recHi:'Güçlü karartma — anahtarları sunucuda tutun; istemci kodu kurşun geçirmez değildir.',
+mapT:'String-dizi eşleme',foundL:'bulgu',noFind:'Karartma deseni yok — kod sade görünüyor.'},
+ar:{tag:'مقياس التعتيم وفكّه والحماية',tabM:'📊 المقياس',tabD:'🔍 الفك',tabP:'🛡️ الحماية',tabDo:'💚 ادعم',
+legalNote:'⚖️ احمِ وحلّل كودك الخاص فقط — أو بتصريح تدقيق.',
+mT:'📊 مقياس قوة التعتيم',mS:'الصق JavaScript — واحصل على درجة 0–100 مع تفصيل كامل.',
+srcPh:'الصق JavaScript هنا...',btnScan:'حلّل',btnPlain:'مثال عادي',btnObf:'مثال معتّم',
+dT:'🔍 مساعد الفك',dS:'افتح الطبقات خطوة بخطوة: الهروب، ومعاينة base64، وجدول المصفوفات، والتجميل. للقراءة فقط.',
+opUnesc:'فك \\x \\u',opB64:'معاينة base64',opArr:'حل المصفوفات',opPretty:'تجميل',btnDeob:'فك',
+pT:'🛡️ حامٍ آمن (تجريبي)',pS:'تحويلات عكوسة لكودك: حذف التعليقات، التصغير، ترميز hex، حزم المصفوفات. تحقق من عمل المخرجات.',
+opStrip:'حذف التعليقات',opMin:'تصغير',opHex:'ترميز hex',opPack:'حزم المصفوفات',btnProt:'احمِ',btnDl:'تنزيل .js',protNote:'حماية تجريبية. للإنتاج استخدم obfuscator معروف واختبر المخرجات.',
+snipT:'🧩 ضد العبث',snDom:'قفل النطاق',snDbg:'مصيدة المطور',snCpy:'منع النسخ',
+doT:'💚 ادعم',doS:'مجاني للأبد. التبرعات تجلب محللات جديدة.',
+btnCopy:'نسخ',adHere:'مساحتك الإعلانية هنا',foot:'StealthScan — مختبر مجاني. كودك لا يغادر المتصفح.',
+copied:'تم ✅',needCode:'الصق الكود أولاً ⚠️',dlDone:'نُزّل ✅',
+kId:'إنتروبيا المعرفات',kEsc:'سلاسل مهرّبة',kEval:'eval / تنفيذ ديناميكي',kOx:'أسماء hex',kArr:'نمط المصفوفات',kMin:'التصغير',kCmt:'نسبة التعليقات',kLine:'أسطر طويلة',
+recLo:'مصدر مقروء — أضف التصغير وترميز السلاسل.',
+recMi:'محمي جزئياً — رمّز السلاسل المتبقية.',
+recHi:'تعتيم قوي — أبقِ المفاتيح في الخادم.',
+mapT:'جدول المصفوفات',foundL:'ملاحظة',noFind:'لا أنماط تعتيم — الكود عادي.'}};
+let lang='en';
+const t=k=>(T[lang]&&T[lang][k])||T.en[k]||k;
+function setLang(v){lang=v;document.documentElement.lang=v;document.documentElement.dir=(v==='ar')?'rtl':'ltr';document.getElementById('langSel').value=v;
+document.querySelectorAll('[data-i]').forEach(e=>{e.textContent=t(e.dataset.i);});
+buildTabs();renderDonate();}
+const TABS=[['meter','tabM'],['deob','tabD'],['protect','tabP'],['donate','tabDo']];
+function buildTabs(){document.getElementById('tabs').innerHTML=TABS.map(x=>`<button id="tab-${x[0]}" onclick="tab('${x[0]}')">${t(x[1])}</button>`).join('');document.getElementById('tab-meter').classList.add('on');}
+function tab(w){TABS.forEach(x=>{const b=document.getElementById('tab-'+x[0]);if(b)b.classList.toggle('on',w===x[0]);document.getElementById('p-'+x[0]).classList.toggle('on',w===x[0]);});}
+function toast(m){let d=document.getElementById('toast');d.textContent=m;d.style.display='block';clearTimeout(d._h);d._h=setTimeout(()=>d.style.display='none',2200);}
+function copyTxt(x){try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(x);}catch(e){}toast(t('copied'));}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function getSrc(){return document.getElementById('srcIn').value;}
+function analyze(src){
+src=String(src||'').slice(0,200000);
+const lines=src.split('\n').filter(l=>l.trim());
+const ids=src.match(/[A-Za-z_$][\w$]*/g)||[];
+const uniq={};ids.forEach(x=>uniq[x]=1);
+const nU=Object.keys(uniq).length,nT=ids.length||1;
+const entropy=nT>10?(1-nU/nT):0;
+const escN=(src.match(/\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}/g)||[]).length;
+const evalN=(src.match(/(^|[^\w$])(eval|Function)\s*\(|setTimeout\s*\(\s*['"`]|setInterval\s*\(\s*['"`]/g)||[]).length;
+const oxM=src.match(/_0x[0-9a-fA-F]{3,}/g)||[];const oxU={};oxM.forEach(x=>oxU[x]=1);
+const arrP=(src.match(/var\s+_0x\w*\s*=\s*\[/g)||[]).length+(src.match(/\[\s*(['"`])[^'"`]*\1\s*(,\s*\1[^'"`]*\1\s*)+\]/g)||[]).length;
+const chars=src.length||1;
+const ws=(src.match(/\s/g)||[]).length;
+const minScore=Math.max(0,1-ws/chars*2.2);
+const cmt=((src.match(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g)||[]).join('').length)/chars;
+const longL=lines.filter(l=>l.length>160).length/Math.max(1,lines.length);
+return {entropy,escN,evalN,oxU:Object.keys(oxU).length,oxM:oxM.length,arrP,minScore,cmt,longL,nT,chars,
+score:0};
+}
+function scoreOf(a){
+let s=0;
+s+=Math.min(25,a.entropy*55);
+s+=Math.min(20,a.escN*1.2+(a.escN>0?4:0));
+s+=Math.min(12,a.evalN*6);
+s+=Math.min(13,a.oxU*2+(a.oxU>0?3:0));
+s+=Math.min(10,a.arrP*5);
+s+=Math.min(12,a.minScore*14);
+s+=Math.min(4,(1-Math.min(1,a.cmt*6))*4);
+s+=Math.min(4,a.longL*14);
+return Math.round(Math.min(100,s));
+}
+function runMeter(){
+const src=getSrc();if(!src.trim()){toast(t('needCode'));return;}
+const a=analyze(src),s=scoreOf(a);
+const cls=s<35?'s-lo':s<70?'s-mi':'s-hi';
+const row=(k,v,max)=>{const p=Math.max(0,Math.min(100,v/max*100));return `<tr><td>${t(k)}</td><td><div class="bar"><div style="width:${p}%"></div></div></td><td>${v}</td></tr>`;};
+const rec=s<35?t('recLo'):s<70?t('recMi'):t('recHi');
+document.getElementById('meterOut').innerHTML=`<div class="gauge"><div class="score ${cls}">${s}</div><div><b>${s}/100</b><br><small style="color:var(--mut)">${a.nT} ids · ${a.chars} chars</small></div></div><table class="pt">${row('kId',a.entropy.toFixed(2),0.6)}${row('kEsc',a.escN,15)}${row('kEval',a.evalN,2)}${row('kOx',a.oxU,6)}${row('kArr',a.arrP,2)}${row('kMin',a.minScore.toFixed(2),0.85)}${row('kCmt',a.cmt.toFixed(2),0.15)}${row('kLine',a.longL.toFixed(2),0.3)}</table><div class="note">${rec}</div>`;
+}
+function loadPlain(){document.getElementById('srcIn').value=SAMPLE_PLAIN;}
+function loadObf(){document.getElementById('srcIn').value=SAMPLE_OBF;}
+function swapStrings(src,fn){
+return src.replace(/('(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`)/g,m=>fn(m));
+}
+function runDeob(){
+let src=getSrc();if(!src.trim()){toast(t('needCode'));return;}
+const log=[];
+if(document.getElementById('dUnesc').checked){
+const n=(src.match(/\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}/g)||[]).length;
+src=swapStrings(src,m=>m.replace(/\\x([0-9a-fA-F]{2})/g,(x,h)=>String.fromCharCode(parseInt(h,16))).replace(/\\u([0-9a-fA-F]{4})/g,(x,h)=>String.fromCharCode(parseInt(h,16))));
+log.push('unesc:'+n);}
+if(document.getElementById('dB64').checked){
+const toks=src.match(/['"`][A-Za-z0-9+/]{24,}={0,2}['"`]/g)||[];
+let shown=0;
+toks.slice(0,12).forEach(tk=>{const raw=tk.slice(1,-1);try{const d=atob(raw);if(/^[\x20-\x7E\s]{4,}$/.test(d)&&d.length<400){log.push('b64:'+raw.slice(0,26)+'… → '+d.slice(0,80));shown++;}}catch(e){}});
+if(!shown)log.push('b64:0');}
+if(document.getElementById('dArr').checked){
+const am=src.match(/var\s+(_0x\w*)\s*=\s*\[([\s\S]{0,4000}?)\];/);
+if(am){const nm=am[1],body=am[2];
+const els=body.split(/,(?=(?:[^'"]|'[^']*'|"[^"]*")*$)/).map(e=>e.trim()).filter(e=>/^['"]/.test(e));
+const map=els.map((e,i)=>`${nm}[${i}]/${nm}[0x${i.toString(16)}] → ${e.slice(0,60)}`);
+src=src.replace(new RegExp(nm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+ '\\[(0x[0-9a-fA-F]+|\\d+)\\]','g'),(m,ix)=>{const i=ix.startsWith('0x')?parseInt(ix,16):+ix;return (els[i]!==undefined)?els[i]:m;});
+log.push('arr:'+els.length+' | '+map.slice(0,10).join(' | '));}
+else log.push('arr:0');}
+if(document.getElementById('dPretty').checked){
+const store=[];src=src.replace(/('(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`)/g,m=>{store.push(m);return '@@S'+(store.length-1)+'@@';});
+src=src.replace(/;/g,';\n').replace(/\{/g,'{\n').replace(/\}/g,'\n}\n');
+let ind=0;src=src.split('\n').map(l=>{l=l.trim();if(!l)return '';if(l[0]==='}')ind=Math.max(0,ind-1);const r='  '.repeat(ind)+l;if(l.endsWith('{'))ind++;return r;}).join('\n');
+src=src.replace(/@@S(\d+)@@/g,(m,i)=>store[+i]!==undefined?store[+i]:m);}
+document.getElementById('deobOut').textContent=(log.length?log.join('\n---\n')+'\n---\n':'')+src;
+}
+function runProtect(){
+let src=getSrc();if(!src.trim()){toast(t('needCode'));return;}
+const before=src.length;
+if(document.getElementById('pStrip').checked){
+const store=[];src=src.replace(/('(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`)/g,m=>{store.push(m);return '@@S'+(store.length-1)+'@@';});
+src=src.replace(/\/\/[^\n]*/g,'').replace(/\/\*[\s\S]*?\*\//g,'');
+src=src.replace(/@@S(\d+)@@/g,(m,i)=>store[+i]);}
+if(document.getElementById('pMin').checked){src=src.replace(/\s+/g,' ').replace(/\s*([;{},()\[\]=+\-*/<>!&|:?])\s*/g,'$1').trim();}
+if(document.getElementById('pHex').checked){
+src=src.replace(/('(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*")/g,m=>{const q=m[0],inner=m.slice(1,-1);
+if(inner.length>200||/\\/.test(inner))return m;
+let h='';for(const ch of inner)h+='\\x'+ch.charCodeAt(0).toString(16).padStart(2,'0');
+return q+h+q;});}
+if(document.getElementById('pArr').checked){
+const store=[];const re=/('(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*")/g;let m;
+while((m=re.exec(src))!==null){const s=m[0];if(s.length>3&&s.length<80&&store.indexOf(s)<0)store.push(s);}
+if(store.length>1){const nm='_0x'+Math.floor(Math.random()*0xffffff).toString(16);
+store.forEach(s=>{src=src.split(s).join(nm+'['+store.indexOf(s)+']');});
+src='var '+nm+'=['+store.join(',')+'];\n'+src;}}
+const after=src.length;
+document.getElementById('protOut').textContent=`/* ${before} → ${after} chars (${Math.round((1-after/Math.max(1,before))*100)}%) */\n`+src;
+window._prot=src;
+}
+function dlProt(){const s=window._prot||document.getElementById('protOut').textContent;if(!s.trim())return;const b=new Blob([s],{type:'text/javascript'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='protected.js';a.click();toast(t('dlDone'));}
+function snip(k){
+let s='';
+if(k==='domain')s=`// Domain lock — aborts on foreign hosts\n(function(){var ok=['yourdomain.com','www.yourdomain.com'];if(ok.indexOf(location.hostname)<0){document.body.innerHTML='';throw new Error('domain');}})();`;
+if(k==='debug')s=`// DevTools trap (demo) — slows casual debugging\nsetInterval(function(){var t=Date.now();debugger;if(Date.now()-t>100){/* paused */}},4000);`;
+if(k==='copy')s=`// Copy-guard\n['copy','cut','contextmenu'].forEach(function(e){document.addEventListener(e,function(ev){ev.preventDefault();});});`;
+document.getElementById('snipOut').textContent=s;
+}
+function renderDonate(){
+document.getElementById('btcA').textContent=CONFIG.pay.btc;
+document.getElementById('usdtA').textContent=CONFIG.pay.usdt;
+}
+function loadAds(){const A=CONFIG.ads,el=document.getElementById('adFoot');if(!el)return;
+if(A.client){el.innerHTML='<ins class="adsbygoogle" style="display:block" data-ad-client="'+A.client+'" data-ad-slot="'+(A.slot||'')+'" data-ad-format="auto"></ins>';
+if(!document.querySelector('script[src*="adsbygoogle"]')){const s=document.createElement('script');s.async=true;s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+A.client;s.crossOrigin='anonymous';document.head.appendChild(s);}try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}}
+else if(A.carbonServe){el.innerHTML='';const s=document.createElement('script');s.async=true;s.id='_carbonads_js';s.src='//cdn.carbonads.com/carbon.js?serve='+A.carbonServe+'&placement='+A.carbonPlacement;el.appendChild(s);}}
+setLang('en');loadAds();renderDonate();
+</script>
+</body>
+</html>
